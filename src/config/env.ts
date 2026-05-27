@@ -4,6 +4,14 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
   APP_BASE_URL: z.string().url().default('http://localhost:3000'),
+  AUTH_REQUIRED: z
+    .string()
+    .optional()
+    .transform((value) => value !== 'false'),
+  MASTER_API_KEY: z.string().optional(),
+  TENANT_API_KEYS: z.string().optional(),
+  DEFAULT_TENANT_RPM_LIMIT: z.coerce.number().int().positive().default(120),
+  DEFAULT_TENANT_CONCURRENCY_LIMIT: z.coerce.number().int().positive().default(20),
   RELAY_DEMO_MODE: z
     .string()
     .optional()
