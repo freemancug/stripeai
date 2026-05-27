@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - APP_BASE_URL=http://localhost:3000
+      - AUTH_REQUIRED=false
+      - MASTER_API_KEY=${MASTER_API_KEY:-master-key-dev}
+      - TENANT_API_KEYS=${TENANT_API_KEYS:-demo-local-key|workspace_demo|user_demo|key_demo|120|20}
+      - DEFAULT_TENANT_RPM_LIMIT=${DEFAULT_TENANT_RPM_LIMIT:-120}
+      - DEFAULT_TENANT_CONCURRENCY_LIMIT=${DEFAULT_TENANT_CONCURRENCY_LIMIT:-20}
+      - RELAY_DEMO_MODE=${RELAY_DEMO_MODE:-true}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-https://api.anthropic.com}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STABLECOIN_TREASURY_ETH=${STABLECOIN_TREASURY_ETH:-0x1111111111111111111111111111111111111111}
+      - STABLECOIN_TREASURY_TRON=${STABLECOIN_TREASURY_TRON:-TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t}
+      - STABLECOIN_TREASURY_SOL=${STABLECOIN_TREASURY_SOL:-9xQeWvG816bUx9EPfEZxTg9P2nXVVh4vYXQqf6F4YyJt}
+      - STABLECOIN_TREASURY_POLYGON=${STABLECOIN_TREASURY_POLYGON:-0x2222222222222222222222222222222222222222}
+      - STABLECOIN_TREASURY_BSC=${STABLECOIN_TREASURY_BSC:-0x3333333333333333333333333333333333333333}
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - /app/node_modules
+    networks:
+      - stripeai-network
+
+networks:
+  stripeai-network:
+    driver: bridge
