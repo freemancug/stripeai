@@ -4,6 +4,9 @@ import test from 'node:test';
 import { buildApp } from '../src/app.js';
 
 const app = buildApp();
+const authHeaders = {
+  authorization: ['Bearer', 'demo-local-key'].join(' ')
+};
 
 after(async () => {
   await app.close();
@@ -23,6 +26,7 @@ test('POST /v1/payments/stablecoin/invoices returns a quote', async () => {
   const response = await app.inject({
     method: 'POST',
     url: '/v1/payments/stablecoin/invoices',
+    headers: authHeaders,
     payload: {
       asset: 'usdc',
       chain: 'solana',
@@ -43,6 +47,7 @@ test('POST /v1/relay/chat/completions returns a normalized relay response', asyn
   const response = await app.inject({
     method: 'POST',
     url: '/v1/relay/chat/completions',
+    headers: authHeaders,
     payload: {
       provider: 'openai',
       model: 'gpt-4.1',
@@ -58,4 +63,36 @@ test('POST /v1/relay/chat/completions returns a normalized relay response', asyn
   assert.equal(response.statusCode, 200);
   assert.equal(response.json().provider, 'openai');
   assert.equal(response.json().mode, 'demo');
+});
+
+test('GET /v1/auth/me returns tenant identity context', async () => {
+  const response = await app.inject({
+    method: 'GET',
+    url: '/v1/auth/me',
+    headers: authHeaders
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().workspaceId, 'workspace_demo');
+  assert.equal(response.json().userId, 'user_demo');
+  assert.equal(response.json().apiKeyId, 'key_demo');
+});
+
+test('POST /v1/relay/chat/completions rejects unauthorized request', async () => {
+  const response = await app.inject({
+    method: 'POST',
+    url: '/v1/relay/chat/completions',
+    payload: {
+      provider: 'openai',
+      model: 'gpt-4.1',
+      messages: [
+        {
+          role: 'user',
+          content: 'hello'
+        }
+      ]
+    }
+  });
+
+  assert.equal(response.statusCode, 401);
 });

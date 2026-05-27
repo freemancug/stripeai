@@ -68,6 +68,7 @@ GET /health
 ```http
 POST /v1/relay/chat/completions
 Content-Type: application/json
+Authorization: [required]
 
 {
   "provider": "openai",
@@ -86,6 +87,7 @@ Content-Type: application/json
 ```http
 POST /v1/payments/stripe/checkout-sessions
 Content-Type: application/json
+Authorization: [required]
 
 {
   "productName": "Pro Plan",
@@ -102,6 +104,7 @@ Content-Type: application/json
 ```http
 POST /v1/payments/stablecoin/invoices
 Content-Type: application/json
+Authorization: [required]
 
 {
   "asset": "usdc",
@@ -132,11 +135,22 @@ npm run test
 
 | 变量 | 说明 |
 | --- | --- |
+| `AUTH_REQUIRED` | 是否开启 `/v1/*` 鉴权，默认 `true` |
+| `TENANT_API_KEYS` | 多租户 API Key 配置：`apiKey|workspaceId|userId|apiKeyId|rpm|concurrency;...` |
+| `DEFAULT_TENANT_RPM_LIMIT` | 未显式配置时的租户每分钟请求上限 |
+| `DEFAULT_TENANT_CONCURRENCY_LIMIT` | 未显式配置时的租户并发上限 |
 | `RELAY_DEMO_MODE` | `true` 时不请求真实模型供应商 |
 | `OPENAI_API_KEY` | OpenAI 密钥 |
 | `ANTHROPIC_API_KEY` | Anthropic 密钥 |
 | `STRIPE_SECRET_KEY` | Stripe 服务端密钥 |
 | `STABLECOIN_TREASURY_*` | 各链稳定币收款地址 |
+
+## 多租户隔离能力（当前实现）
+
+- 所有 `/v1/*` 请求默认要求携带 Authorization 头
+- API Key 解析后绑定 `workspaceId + userId + apiKeyId`
+- 按 `workspaceId` 执行独立 RPM 限流与并发隔离（互不影响）
+- 可使用 `GET /v1/auth/me` 验证当前请求身份和配额限制
 
 ## 架构文档
 
