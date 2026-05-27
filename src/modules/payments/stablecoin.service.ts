@@ -27,7 +27,7 @@ const networkFeeHints = {
 
 export class StablecoinPaymentService {
   createInvoice(input: CreateStablecoinInvoiceInput) {
-    const supportedAssets = supportedAssetsByChain[input.chain];
+    const supportedAssets = supportedAssetsByChain[input.chain] as readonly string[];
 
     if (!supportedAssets.includes(input.asset)) {
       throw new Error(`${input.asset} is not supported on ${input.chain}`);

@@ -19,14 +19,16 @@ export const buildApp = () => {
   app.register(paymentRoutes);
 
   app.setErrorHandler((error, _request, reply) => {
+    const normalizedError =
+      error instanceof Error ? error : new Error('Unexpected application error');
     const statusCode =
       typeof (error as { statusCode?: number }).statusCode === 'number'
         ? (error as { statusCode: number }).statusCode
         : 400;
 
     reply.status(statusCode).send({
-      error: error.name,
-      message: error.message
+      error: normalizedError.name,
+      message: normalizedError.message
     });
   });
 

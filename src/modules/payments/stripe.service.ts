@@ -7,9 +7,7 @@ const toStripeMetadata = (metadata: Record<string, string>) =>
 
 export class StripePaymentService {
   private readonly stripe = env.STRIPE_SECRET_KEY
-    ? new Stripe(env.STRIPE_SECRET_KEY, {
-        apiVersion: '2025-04-30.basil'
-      })
+    ? new Stripe(env.STRIPE_SECRET_KEY)
     : null;
 
   async createCheckoutSession(input: CreateStripeCheckoutInput) {
